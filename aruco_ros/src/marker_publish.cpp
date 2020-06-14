@@ -164,7 +164,20 @@ public:
       cv_bridge::CvImagePtr cv_ptr;
       try
       {
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8);
+        if(msg->encoding == "16UC1") {
+          sensor_msgs::Image img;
+          img.header = msg->header;
+          img.height = msg->height;
+          img.width = msg->width;
+          img.is_bigendian = msg->is_bigendian;
+          img.step = msg->step;
+          img.data = msg->data;
+          img.encoding = "mono16";
+          cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);  
+        } else {
+          cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8);
+        }
+
         inImage_ = cv_ptr->image;
 
         //clear out previous detection results
